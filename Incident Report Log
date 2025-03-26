@@ -1,0 +1,267 @@
+[
+    {
+        "id": "75af6f09b7f9c2c8",
+        "type": "tab",
+        "label": "Incident Report",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "dd85c4ffd94435bb",
+        "type": "ui-form",
+        "z": "75af6f09b7f9c2c8",
+        "name": "Incident Report Form",
+        "group": "9453eb8b7d0bba95",
+        "label": "",
+        "order": 1,
+        "width": "8",
+        "height": "1",
+        "options": [
+            {
+                "label": "Date",
+                "key": "Date",
+                "type": "date",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Time",
+                "key": "Time",
+                "type": "time",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Notes",
+                "key": "Notes",
+                "type": "multiline",
+                "required": false,
+                "rows": 5
+            }
+        ],
+        "formValue": {
+            "Date": "",
+            "Time": "",
+            "Notes": ""
+        },
+        "payload": "",
+        "submit": "Submit",
+        "cancel": "Clear",
+        "resetOnSubmit": true,
+        "topic": "Form",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "passthru": false,
+        "dropdownOptions": [],
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "939e602f3b6211fa"
+            ]
+        ]
+    },
+    {
+        "id": "ebbc0814a24b6957",
+        "type": "ui-button",
+        "z": "75af6f09b7f9c2c8",
+        "group": "444ee06a4694f6db",
+        "name": "",
+        "label": "Clear Last Entry",
+        "order": 1,
+        "width": "4",
+        "height": "1",
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "clear_last",
+        "payloadType": "str",
+        "topic": "clear_last",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 100,
+        "y": 160,
+        "wires": [
+            [
+                "939e602f3b6211fa"
+            ]
+        ]
+    },
+    {
+        "id": "939e602f3b6211fa",
+        "type": "function",
+        "z": "75af6f09b7f9c2c8",
+        "name": "function 4",
+        "func": "// Get existing submissions from flow (initialize as empty array if none exist)\nvar submissions = flow.get('formSubmissions') || [];\n\n// Check if the message is from the \"Clear Last Entry\" button\nif (msg.payload === \"clear_last\") {\n    if (submissions.length > 0) {\n        submissions.pop();  // Remove the last entry\n    }\n} else {\n    // Extract and format form data when a new entry is submitted\n    var date = new Date(msg.payload.Date);\n    var time = (msg.payload.Time || '').trim();\n    var notes = msg.payload.Notes || 'No Notes Entered';\n\n    // Format the date as YYYY-MM-DD\n    var formattedDate = date.toISOString().split('T')[0];\n\n    // Format the time to 12-hour AM/PM format\n    var timeParts = time.split(':');\n    var hours = parseInt(timeParts[0], 10);\n    var minutes = timeParts[1];\n    var ampm = hours >= 12 ? 'PM' : 'AM';\n    hours = hours % 12 || 12;\n    var formattedTime = `${hours}:${minutes} ${ampm}`;\n\n    // Push a formatted string instead of an object to avoid [object Object]\n    submissions.push(`Date: ${formattedDate}<br>Time: ${formattedTime}<br>Notes: ${notes}<br>---`);\n}\n\n// Save updated list back to flow\nflow.set('formSubmissions', submissions);\n\n// Join all entries with line breaks and send to template\nmsg.payload = submissions.join('<br><br>');  // Ensures proper spacing between entries\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 140,
+        "wires": [
+            [
+                "2d90a64845983a2a",
+                "4f4e4e3b6e4f89a5"
+            ]
+        ]
+    },
+    {
+        "id": "4f4e4e3b6e4f89a5",
+        "type": "debug",
+        "z": "75af6f09b7f9c2c8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "2d90a64845983a2a",
+        "type": "ui-text",
+        "z": "75af6f09b7f9c2c8",
+        "group": "444ee06a4694f6db",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": true,
+        "className": "",
+        "x": 530,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "9453eb8b7d0bba95",
+        "type": "ui-group",
+        "name": "Incident Report Form",
+        "page": "8faa42d0ed1f6fcc",
+        "width": "8",
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "444ee06a4694f6db",
+        "type": "ui-group",
+        "name": "Incident Report Log",
+        "page": "8faa42d0ed1f6fcc",
+        "width": "4",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "8faa42d0ed1f6fcc",
+        "type": "ui-page",
+        "name": "Incident Report Log",
+        "ui": "996a4237e2450a99",
+        "path": "/page3",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "5d6ef8872f825be0",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "996a4237e2450a99",
+        "type": "ui-base",
+        "name": "Welcome to ProTech",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true
+    },
+    {
+        "id": "5d6ef8872f825be0",
+        "type": "ui-theme",
+        "name": "ProTech Logo",
+        "colors": {
+            "surface": "#89f1ff",
+            "primary": "#ffffff",
+            "bgPage": "#0e3d43",
+            "groupBg": "#0e3d43",
+            "groupOutline": "#89f1ff"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    }
+]
